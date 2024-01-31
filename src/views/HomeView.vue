@@ -4,6 +4,7 @@ import type { IChartRequest, IChartResponse, IHashRequest, IHashResponse } from 
 import { ref } from 'vue'
 import { baseGETRequest } from '@/functions'
 import AppLoader from '@/components/UI/AppLoader.vue'
+import TxHashSection from '@/components/sections/TxHashSection.vue'
 const txHashFormFields = [
   {
     value: '',
@@ -13,6 +14,9 @@ const txHashFormFields = [
   }
 ]
 const txHashFormError = ref('')
+const txHashResponse = ref({
+  pools: []
+})
 
 const chartFormFields = [
   {
@@ -43,7 +47,7 @@ async function generateHash(query: IHashRequest): Promise<void> {
     const response: IHashResponse = await baseGETRequest(
       `http://g.cybara.io/detect?txHash=${query.txHash}`
     )
-    console.log(response)
+    txHashResponse.value = response
   } catch (e: any) {
     console.error(e)
     txHashFormError.value = e.error
@@ -72,6 +76,11 @@ function beforeRequest(): void {
   txHashFormError.value = ''
   chartFormError.value = ''
 }
+
+function pickPool(pool): void {
+  console.log(pool)
+}
+
 </script>
 
 <template>
@@ -90,13 +99,14 @@ function beforeRequest(): void {
       ></AppForm>
     </div>
     <AppLoader v-if="showLoader" />
+    <TxHashSection :pools="txHashResponse.pools" @pick-pool="pickPool"/>
   </main>
 </template>
 
 <style lang="scss">
 .forms {
   display: flex;
-  margin: 0 -20px;
+  margin: 0 -20px 20px;
   .app-form {
     margin: 20px;
   }

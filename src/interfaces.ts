@@ -48,7 +48,7 @@ interface IBlock {
   blockNumber: number;
   prices: IPrice[]
 }
-interface IPool {
+export interface IPool {
   Address: string,
   Name: string,
   Token0: string,
