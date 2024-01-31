@@ -8,3 +8,12 @@ html {
 html * {
   font-family: 'Roboto', sans-serif;
 }
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  padding: 10px;
+  overflow-x: hidden;
+}
