@@ -1,10 +1,18 @@
 <script setup lang="ts">
 import AppForm from '@/components/UI/AppForm.vue'
-import type { IChartRequest, IChartResponse, IHashRequest, IHashResponse } from '@/interfaces'
+import type {
+  ICandle,
+  IChartRequest,
+  IChartResponse,
+  IHashRequest,
+  IHashResponse,
+  IPrice
+} from '@/interfaces'
 import { ref } from 'vue'
 import { baseGETRequest } from '@/functions'
 import AppLoader from '@/components/UI/AppLoader.vue'
 import TxHashSection from '@/components/sections/TxHashSection.vue'
+import ChartSection from '@/components/sections/ChartSection.vue'
 const txHashFormFields = [
   {
     value: '',
@@ -17,6 +25,7 @@ const txHashFormError = ref('')
 const txHashResponse = ref({
   pools: []
 })
+const chartData = ref([])
 
 const chartFormFields = [
   {
@@ -41,12 +50,14 @@ const chartFormFields = [
 const chartFormError = ref('')
 
 const showLoader = ref(false)
+const currentSection = ref('')
 async function generateHash(query: IHashRequest): Promise<void> {
   try {
     beforeRequest()
     const response: IHashResponse = await baseGETRequest(
       `http://g.cybara.io/detect?txHash=${query.txHash}`
     )
+    currentSection.value = 'txHash'
     txHashResponse.value = response
   } catch (e: any) {
     console.error(e)
@@ -62,7 +73,8 @@ async function generateChart(query: IChartRequest): Promise<void> {
     const response: IChartResponse = await baseGETRequest(
       `http://g.cybara.io/api?poolAddress=${query.poolAddress}&startingBlock=${query.startingBlock}&blocks=${query.blocks}`
     )
-    console.log(response)
+    currentSection.value = 'chart'
+    chartData.value = formatChartData(response)
   } catch (e: any) {
     console.error(e)
     chartFormError.value = e.error
@@ -81,6 +93,55 @@ function pickPool(pool): void {
   console.log(pool)
 }
 
+function formatChartData(data: IChartResponse): ICandle[] {
+  let formatData: ICandle[] = [];
+  let loopLength: number = data.blocks[data.blocks.length - 1].blockNumber - data.blocks[0].blockNumber;
+  let lastBlockNumber: number = data.blocks[0].blockNumber - 1;
+  let lastOpen: string = data.poolInfo.startingPrice;
+  let lastHigh: string = '';
+  let lastLow: string = '';
+  let lastClose: string = data.poolInfo.startingPrice;
+
+  let i = 0;
+  while (formatData.length - 1 !== loopLength) {
+    lastBlockNumber++;
+    let prices: IPrice[] = [];
+    if (data.blocks[i].blockNumber === lastBlockNumber) {
+      let high: number = 0,
+        low: number = Infinity;
+      lastOpen = lastClose;
+      data.blocks[i].prices.forEach((price: IPrice, k: number): void => {
+        if (+price.priceAfter > high) {
+          lastHigh = price.priceAfter
+          high = +price.priceAfter;
+        }
+        if (+price.priceAfter < low) {
+          lastLow = price.priceAfter
+          low = +price.priceAfter;
+        }
+        if (k === data.blocks[i].prices.length - 1) {
+          lastClose = price.priceAfter;
+        }
+        prices.push({
+          ...price
+        })
+      });
+      i++;
+      formatData.push({
+        x: lastBlockNumber + '',
+        y: [lastOpen, lastHigh, lastLow, lastClose],
+        prices
+      });
+    } else {
+      formatData.push({
+        x: lastBlockNumber + '',
+        y: [lastClose, lastClose, lastClose, lastClose],
+        prices
+      });
+    }
+  }
+  return formatData;
+}
 </script>
 
 <template>
@@ -99,7 +160,15 @@ function pickPool(pool): void {
       ></AppForm>
     </div>
     <AppLoader v-if="showLoader" />
-    <TxHashSection :pools="txHashResponse.pools" @pick-pool="pickPool"/>
+    <TxHashSection
+      :pools="txHashResponse.pools"
+      @pick-pool="pickPool"
+      v-if="currentSection === 'txHash'"
+    />
+    <ChartSection
+      v-if="currentSection === 'chart'"
+      :series="chartData"
+    />
   </main>
 </template>
 
