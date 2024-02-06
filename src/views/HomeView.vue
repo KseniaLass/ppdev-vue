@@ -5,7 +5,7 @@ import type {
   IChartRequest,
   IChartResponse,
   IHashRequest,
-  IHashResponse,
+  IHashResponse, IPool,
   IPrice
 } from '@/interfaces'
 import { ref } from 'vue'
@@ -22,9 +22,7 @@ const txHashFormFields = [
   }
 ]
 const txHashFormError = ref('')
-const txHashResponse = ref({
-  pools: []
-})
+const txHashResponse = ref<IHashResponse>()
 const chartData = ref([])
 
 const chartFormFields = [
@@ -89,8 +87,12 @@ function beforeRequest(): void {
   chartFormError.value = ''
 }
 
-function pickPool(pool): void {
-  console.log(pool)
+function pickPool(pool: IPool): void {
+  generateChart({
+    poolAddress: pool.Address,
+    startingBlock: txHashResponse.value?.block.toString() || '',
+    blocks: '100'
+  })
 }
 
 function formatChartData(data: IChartResponse): ICandle[] {
