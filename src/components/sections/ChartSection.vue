@@ -53,12 +53,9 @@ const options = {
 
 <style lang="scss">
 .chart-section {
-  margin: 0 -20px;
+  margin-left: -20px;
 }
 .chart {
   width: 100%;
-  .apexcharts-toolbar {
-    right: 30px !important;
-  }
 }
 </style>

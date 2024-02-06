@@ -13,19 +13,24 @@ import { baseGETRequest } from '@/functions'
 import AppLoader from '@/components/UI/AppLoader.vue'
 import TxHashSection from '@/components/sections/TxHashSection.vue'
 import ChartSection from '@/components/sections/ChartSection.vue'
-const txHashFormFields = [
+import router from '@/router'
+import { useRoute } from 'vue-router'
+
+const $route = useRoute()
+
+const txHashFormFields = ref([
   {
     value: '',
     label: 'txHash',
     name: 'txHash',
     required: true
   }
-]
+])
 const txHashFormError = ref('')
 const txHashResponse = ref<IHashResponse>()
 const chartData = ref([])
 
-const chartFormFields = [
+const chartFormFields = ref([
   {
     value: '',
     label: 'poolAddress',
@@ -44,9 +49,8 @@ const chartFormFields = [
     name: 'blocks',
     required: true
   }
-]
+])
 const chartFormError = ref('')
-
 const showLoader = ref(false)
 const currentSection = ref('')
 async function generateHash(query: IHashRequest): Promise<void> {
@@ -57,6 +61,8 @@ async function generateHash(query: IHashRequest): Promise<void> {
     )
     currentSection.value = 'txHash'
     txHashResponse.value = response
+    setDataToHashForm(query)
+    router.push({path: '/', query: {txHash: query.txHash}})
   } catch (e: any) {
     console.error(e)
     txHashFormError.value = e.error
@@ -73,6 +79,8 @@ async function generateChart(query: IChartRequest): Promise<void> {
     )
     currentSection.value = 'chart'
     chartData.value = formatChartData(response)
+    setDataToChartForm(query)
+    router.push({path: '/', query})
   } catch (e: any) {
     console.error(e)
     chartFormError.value = e.error
@@ -93,6 +101,15 @@ function pickPool(pool: IPool): void {
     startingBlock: txHashResponse.value?.block.toString() || '',
     blocks: '100'
   })
+}
+
+function setDataToHashForm(data: IHashRequest): void {
+  txHashFormFields.value[0].value = data.txHash
+}
+function setDataToChartForm(data: IChartRequest): void {
+  chartFormFields.value[0].value = data.poolAddress
+  chartFormFields.value[1].value = data.startingBlock
+  chartFormFields.value[2].value = data.blocks
 }
 
 function formatChartData(data: IChartResponse): ICandle[] {
@@ -144,6 +161,14 @@ function formatChartData(data: IChartResponse): ICandle[] {
   }
   return formatData;
 }
+
+
+if ($route.query.txHash) {
+  generateHash($route.query)
+} else if ($route.query.poolAddress && $route.query.startingBlock && $route.query.blocks) {
+  generateChart($route.query)
+}
+
 </script>
 
 <template>

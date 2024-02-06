@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { IFormField, IHashRequest } from '@/interfaces'
-import { ref, toRaw } from 'vue'
+import { ref, toRaw, watch } from 'vue'
 
 const props = withDefaults(defineProps<{
   fields: IFormField[],
@@ -13,9 +13,14 @@ const emit = defineEmits<{
 }>()
 
 const values = ref({});
-props.fields.forEach(field => {
-  values.value[field.name] = field.value
+
+watch(props.fields, (val: IFormField[]) => {
+  val.forEach(field => setValue(field.value, field.name))
 })
+
+function setValue(value: string, key: string): void {
+  values.value[key] = value
+}
 
 function submit(): void {
   emit('submit', {...values.value})
@@ -30,7 +35,7 @@ function submit(): void {
       @submit.prevent="submit"
     >
       <div
-        v-for="field in fields"
+        v-for="(field, i) in fields"
         :key="field.name"
         class="form__field"
       >
@@ -44,7 +49,8 @@ function submit(): void {
           :name="field.name"
           class="form__input"
           :required="field.required"
-          v-model="values[field.name]"
+          :value="props.fields[i].value"
+          @input="setValue($event.target.value, field.name)"
         />
       </div>
       <input

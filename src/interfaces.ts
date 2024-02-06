@@ -1,21 +1,21 @@
 export interface IFormField {
-  value: String
-  label: String
-  name: String
-  required: Boolean
+  value: string
+  label: string
+  name: string
+  required: boolean
 }
 export interface IHashRequest {
   txHash: string
 }
 export interface IHashResponse {
-  success: Boolean
+  success: boolean
   error: string
   txHash: string
   pools: IPool[]
   block: number
 }
 export interface IChartResponse {
-  success: Boolean
+  success: boolean
   error: string
   poolInfo: IPoolInfo
   blocks: IBlock[]
