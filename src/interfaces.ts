@@ -34,11 +34,16 @@ export interface IPool {
   Liquidity1: string
 }
 export interface IPrice {
-  txHash: string
-  priceAfter: string
+  coinbaseTransfer: string
+  fee: string
+  impact: string
   liquidity0: string
   liquidity1: string
-  txURL?: string
+  priceAfter: string
+  sender: string
+  side: string
+  txHash: string
+  x: string
 }
 // y: [open, high, low, close]
 export interface ICandle {

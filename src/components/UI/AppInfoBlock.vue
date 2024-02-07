@@ -4,7 +4,7 @@
   const props = withDefaults(
     defineProps<{
       json: Object,
-      clickable: Boolean
+      clickable?: Boolean
     }>(), {
       clickable: false
     }
@@ -19,7 +19,7 @@
         <strong>{{ key }}</strong>
       </a>
     </template>
-    <template v-else-if="key === 'poolAddress'">
+    <template v-else-if="key === 'poolAddress' || key === 'sender'">
       <a :href="`https://etherscan.io/address/${value}`" target="_blank">
         <strong>{{ key }}</strong>
       </a>
