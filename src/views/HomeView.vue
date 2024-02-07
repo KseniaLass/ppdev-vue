@@ -5,7 +5,7 @@ import type {
   IChartRequest,
   IChartResponse,
   IHashRequest,
-  IHashResponse, IPool,
+  IHashResponse, IPool, IPoolInfo,
   IPrice
 } from '@/interfaces'
 import { ref } from 'vue'
@@ -15,6 +15,7 @@ import TxHashSection from '@/components/sections/TxHashSection.vue'
 import ChartSection from '@/components/sections/ChartSection.vue'
 import router from '@/router'
 import { useRoute } from 'vue-router'
+import AppInfoBlock from '@/components/UI/AppInfoBlock.vue'
 
 const $route = useRoute()
 
@@ -29,6 +30,7 @@ const txHashFormFields = ref([
 const txHashFormError = ref('')
 const txHashResponse = ref<IHashResponse>()
 const chartData = ref([])
+const poolInfo = ref<IPoolInfo>()
 
 const chartFormFields = ref([
   {
@@ -87,6 +89,7 @@ async function generateChart(query: IChartRequest): Promise<void> {
     )
     currentSection.value = 'chart'
     chartData.value = formatChartData(response)
+    poolInfo.value = response.poolInfo
     setDataToChartForm(query)
     router.push({path: '/', query})
   } catch (e: any) {
@@ -200,10 +203,14 @@ if ($route.query.txHash) {
       @pick-pool="pickPool"
       v-if="currentSection === 'txHash'"
     />
-    <ChartSection
+    <template
       v-if="currentSection === 'chart'"
-      :series="chartData"
-    />
+    >
+      <AppInfoBlock :json="poolInfo"/>
+      <ChartSection
+        :series="chartData"
+      />
+    </template>
   </main>
 </template>
 

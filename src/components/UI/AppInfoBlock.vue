@@ -1,4 +1,6 @@
 <script setup lang="ts">
+  import { computed } from 'vue'
+
   const props = withDefaults(
     defineProps<{
       json: Object,
@@ -12,8 +14,25 @@
 <template>
 <div class="info-block" :class="{clickable: clickable}">
   <div v-for="(value, key) in json" :key="key" class="info-block__item">
-    <strong>{{key}}: </strong>
-    <span>{{value}}</span>
+    <template v-if="key === 'txHash'">
+      <a :href="`https://etherscan.io/tx/${value}`" target="_blank">
+        <strong>{{ key }}</strong>
+      </a>
+    </template>
+    <template v-else-if="key === 'poolAddress'">
+      <a :href="`https://etherscan.io/address/${value}`" target="_blank">
+        <strong>{{ key }}</strong>
+      </a>
+    </template>
+    <template v-else-if="key === 'token0' || key === 'token1'">
+      <a :href="`https://etherscan.io/token/${value}`" target="_blank">
+        <strong>{{ key }}</strong>
+      </a>
+    </template>
+    <template v-else>
+      <strong>{{key}}: </strong>
+      <span>{{value}}</span>
+    </template>
   </div>
 </div>
 </template>

@@ -1,3 +1,4 @@
+@use 'variables' as var;
 @import '../fonts/Roboto.scss';
 
 html {
@@ -16,4 +17,11 @@ html * {
 body {
   padding: 10px;
   overflow-x: hidden;
+}
+
+a {
+  color: var.$link;
+  &:hover {
+    color: var.$linkhover;
+  }
 }

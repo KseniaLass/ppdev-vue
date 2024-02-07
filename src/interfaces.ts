@@ -46,7 +46,7 @@ export interface ICandle {
   y: [string, string, string, string],
   prices: IPrice[]
 }
-interface IPoolInfo {
+export interface IPoolInfo {
   poolAddress: string
   token0: string
   token1: string
