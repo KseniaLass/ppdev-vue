@@ -59,10 +59,18 @@ async function generateHash(query: IHashRequest): Promise<void> {
     const response: IHashResponse = await baseGETRequest(
       `http://g.cybara.io/detect?txHash=${query.txHash}`
     )
-    currentSection.value = 'txHash'
-    txHashResponse.value = response
-    setDataToHashForm(query)
-    router.push({path: '/', query: {txHash: query.txHash}})
+    if (response.pools.length > 1) {
+      currentSection.value = 'txHash'
+      txHashResponse.value = response
+      setDataToHashForm(query)
+      router.push({path: '/', query: {txHash: query.txHash}})
+    } else {
+      generateChart({
+        poolAddress: response.pools[0].Address,
+        startingBlock: response.block.toString(),
+        blocks: '100'
+      })
+    }
   } catch (e: any) {
     console.error(e)
     txHashFormError.value = e.error
