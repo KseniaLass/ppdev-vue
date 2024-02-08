@@ -15,8 +15,7 @@ const router = createRouter({
   ]
 })
 
-router.beforeEach((to) => {
-  console.log('dddd')
+router.beforeEach((to, from) => {
   const poolsStore = usePoolsStore()
   const blocksStore = useBlocksStore()
   const commonStore = useCommonStore()

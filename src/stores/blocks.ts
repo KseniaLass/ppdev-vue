@@ -19,10 +19,11 @@ export const useBlocksStore = defineStore('blocksStore', () => {
   })
 
   const formatChartData = computed((): ICandle[] => {
+    if (blocks.value.blocks.length === 0) return []
     const data = blocks.value
     const formatData: ICandle[] = []
     const loopLength: number =
-      data.blocks[data.blocks.length - 1].blockNumber - data.blocks[0].blockNumber
+      data.blocks[data.blocks.length - 1].blockNumber - data.blocks[0].blockNumber || 0
     let lastBlockNumber: number = data.blocks[0].blockNumber - 1
     let lastOpen: string = data.poolInfo.startingPrice
     let lastHigh: string = ''
@@ -70,8 +71,12 @@ export const useBlocksStore = defineStore('blocksStore', () => {
     return formatData
   })
 
-  async function getBlocks(fields: IBlocksRequest): Promise<void> {
+  async function getBlocks(fields: IBlocksRequest): Promise<void | boolean> {
     const commonStore = useCommonStore()
+    if (JSON.stringify(query.value) === JSON.stringify(fields)) {
+      commonStore.setCurrentPage('blocks')
+      return true
+    }
     try {
       commonStore.setLoader(true)
       blocks.value.error = ''

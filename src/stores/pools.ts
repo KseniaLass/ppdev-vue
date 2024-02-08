@@ -17,9 +17,12 @@ export const usePoolsStore = defineStore('poolsStore', () => {
     block: 0
   })
 
-  async function getPools(fields: IPoolsRequest): Promise<void> {
-    console.log('ff', fields, 'query', query.value)
+  async function getPools(fields: IPoolsRequest): Promise<void | boolean> {
     const commonStore = useCommonStore()
+    if (JSON.stringify(query.value) === JSON.stringify(fields)) {
+      commonStore.setCurrentPage('pools')
+      return true
+    }
     try {
       commonStore.setLoader(true)
       pools.value.error = ''
