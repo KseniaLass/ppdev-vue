@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { IBlocksRequest, IFormField, IPoolsRequest } from '@/interfaces'
-import { ref, toRaw, watch } from 'vue'
+import type { IFormField } from '@/interfaces'
+import { ref, watch } from 'vue'
 
 const props = withDefaults(
   defineProps<{
@@ -19,17 +19,12 @@ const values = ref({})
 
 values.value = { ...props.fields }
 
-// watch(props.fields, (val: IFormField) => {
-//   console.log('ddd')
-//   values.value =  { ...val }
-// })
 watch(
   () => props.fields,
   () => {
-    console.log('prop value changed', props.fields)
-    // for(let key of props.fields.value) {
-    //   values.value[key] = props.fields[key]
-    // }
+    for(let key in {...props.fields}) {
+      values.value[key] = props.fields[key]
+    }
   }
 )
 
