@@ -9,16 +9,18 @@ import type {
   IPrice
 } from '@/interfaces'
 import { ref } from 'vue'
-import { baseGETRequest } from '@/functions'
+import { baseGETRequest, formatChartData } from '@/functions'
 import AppLoader from '@/components/UI/AppLoader.vue'
 import TxHashSection from '@/components/sections/TxHashSection.vue'
 import ChartSection from '@/components/sections/ChartSection.vue'
 import router from '@/router'
 import { useRoute } from 'vue-router'
 import AppInfoBlock from '@/components/UI/AppInfoBlock.vue'
+import { useCommonStore } from '@/stores/common'
 
 const $route = useRoute()
 
+// TxHash data
 const txHashFormFields = ref([
   {
     value: '',
@@ -29,9 +31,8 @@ const txHashFormFields = ref([
 ])
 const txHashFormError = ref('')
 const txHashResponse = ref<IHashResponse>()
-const chartData = ref([])
-const poolInfo = ref<IPoolInfo>()
 
+// Chart data
 const chartFormFields = ref([
   {
     value: '',
@@ -53,8 +54,14 @@ const chartFormFields = ref([
   }
 ])
 const chartFormError = ref('')
-const showLoader = ref(false)
-const currentSection = ref('')
+const chartData = ref([])
+const poolInfo = ref<IPoolInfo>()
+
+// Common state
+
+const commonStore = useCommonStore()
+
+// Functions
 async function generateHash(query: IHashRequest): Promise<void> {
   try {
     beforeRequest()
@@ -62,7 +69,7 @@ async function generateHash(query: IHashRequest): Promise<void> {
       `http://g.cybara.io/detect?txHash=${query.txHash}`
     )
     if (response.pools.length > 1) {
-      currentSection.value = 'txHash'
+      commonStore.setCurrentPage('txHash')
       txHashResponse.value = response
       setDataToHashForm(query)
       router.push({path: '/', query: {txHash: query.txHash}})
@@ -77,7 +84,7 @@ async function generateHash(query: IHashRequest): Promise<void> {
     console.error(e)
     txHashFormError.value = e.error
   } finally {
-    showLoader.value = false
+    commonStore.setLoader(false)
   }
 }
 
@@ -87,7 +94,7 @@ async function generateChart(query: IChartRequest): Promise<void> {
     const response: IChartResponse = await baseGETRequest(
       `http://g.cybara.io/api?poolAddress=${query.poolAddress}&startingBlock=${query.startingBlock}&blocks=${query.blocks}`
     )
-    currentSection.value = 'chart'
+    commonStore.setCurrentPage('chart')
     chartData.value = formatChartData(response)
     poolInfo.value = response.poolInfo
     setDataToChartForm(query)
@@ -96,12 +103,12 @@ async function generateChart(query: IChartRequest): Promise<void> {
     console.error(e)
     chartFormError.value = e.error
   } finally {
-    showLoader.value = false
+    commonStore.setLoader(false)
   }
 }
 
 function beforeRequest(): void {
-  showLoader.value = true
+  commonStore.setLoader(true)
   txHashFormError.value = ''
   chartFormError.value = ''
 }
@@ -123,62 +130,15 @@ function setDataToChartForm(data: IChartRequest): void {
   chartFormFields.value[2].value = data.blocks
 }
 
-function formatChartData(data: IChartResponse): ICandle[] {
-  let formatData: ICandle[] = [];
-  let loopLength: number = data.blocks[data.blocks.length - 1].blockNumber - data.blocks[0].blockNumber;
-  let lastBlockNumber: number = data.blocks[0].blockNumber - 1;
-  let lastOpen: string = data.poolInfo.startingPrice;
-  let lastHigh: string = '';
-  let lastLow: string = '';
-  let lastClose: string = data.poolInfo.startingPrice;
-
-  let i = 0;
-  while (formatData.length - 1 !== loopLength) {
-    lastBlockNumber++;
-    let prices: IPrice[] = [];
-    if (data.blocks[i].blockNumber === lastBlockNumber) {
-      let high: number = 0,
-        low: number = Infinity;
-      lastOpen = lastClose;
-      data.blocks[i].prices.forEach((price: IPrice, k: number): void => {
-        if (+price.priceAfter > high) {
-          lastHigh = price.priceAfter
-          high = +price.priceAfter;
-        }
-        if (+price.priceAfter < low) {
-          lastLow = price.priceAfter
-          low = +price.priceAfter;
-        }
-        if (k === data.blocks[i].prices.length - 1) {
-          lastClose = price.priceAfter;
-        }
-        prices.push({
-          ...price
-        })
-      });
-      i++;
-      formatData.push({
-        x: lastBlockNumber + '',
-        y: [lastOpen, lastHigh, lastLow, lastClose],
-        prices
-      });
-    } else {
-      formatData.push({
-        x: lastBlockNumber + '',
-        y: [lastClose, lastClose, lastClose, lastClose],
-        prices
-      });
-    }
+function checkQuery () {
+  if ($route.query.txHash) {
+    generateHash($route.query)
+  } else if ($route.query.poolAddress && $route.query.startingBlock && $route.query.blocks) {
+    generateChart($route.query)
   }
-  return formatData;
 }
 
-
-if ($route.query.txHash) {
-  generateHash($route.query)
-} else if ($route.query.poolAddress && $route.query.startingBlock && $route.query.blocks) {
-  generateChart($route.query)
-}
+checkQuery()
 
 </script>
 
@@ -197,14 +157,14 @@ if ($route.query.txHash) {
         @submit="generateChart($event)"
       ></AppForm>
     </div>
-    <AppLoader v-if="showLoader" />
+    <AppLoader v-if="commonStore.showLoader" />
     <TxHashSection
       :pools="txHashResponse.pools"
       @pick-pool="pickPool"
-      v-if="currentSection === 'txHash'"
+      v-if="commonStore.currentPage === 'txHash'"
     />
     <template
-      v-if="currentSection === 'chart'"
+      v-if="commonStore.currentPage === 'chart'"
     >
       <AppInfoBlock :json="poolInfo"/>
       <ChartSection
