@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
-type Page = 'default' | 'txHash' | 'chart'
+type Page = 'default' | 'pools' | 'blocks'
 
 export const useCommonStore = defineStore('commonStore', () => {
   const showLoader = ref<boolean>(false)

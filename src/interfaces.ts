@@ -1,26 +1,23 @@
 export interface IFormField {
-  value: string
-  label: string
-  name: string
-  required: boolean
+  [key: string]: string
 }
-export interface IHashRequest {
+export interface IPoolsRequest {
   txHash: string
 }
-export interface IHashResponse {
+export interface IPoolsResponse {
   success: boolean
   error: string
   txHash: string
   pools: IPool[]
   block: number
 }
-export interface IChartResponse {
+export interface IBlocksResponse {
   success: boolean
   error: string
   poolInfo: IPoolInfo
   blocks: IBlock[]
 }
-export interface IChartRequest {
+export interface IBlocksRequest {
   poolAddress: string
   startingBlock: string
   blocks: string

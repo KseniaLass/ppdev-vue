@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import type { IFormField, IHashRequest } from '@/interfaces'
+import type { IFormField } from '@/interfaces'
 import { ref, toRaw, watch } from 'vue'
 
 const props = withDefaults(defineProps<{
-  fields: IFormField[],
-  errorMsg?: String
+  fields: IFormField,
+  errorMsg: String
 }>(), {
   errorMsg: ''
 })
 const emit = defineEmits<{
-  submit: IHashRequest
+  submit: IFormField
 }>()
 
 const values = ref({});
 
-watch(props.fields, (val: IFormField[]) => {
-  val.forEach(field => setValue(field.value, field.name))
+watch(props.fields, (val: IFormField) => {
+  values.value =  { ...val }
 })
 
 function setValue(value: string, key: string): void {
@@ -35,22 +35,22 @@ function submit(): void {
       @submit.prevent="submit"
     >
       <div
-        v-for="(field, i) in fields"
-        :key="field.name"
+        v-for="(value, key) in fields"
+        :key="key"
         class="form__field"
       >
         <label
-          :for="field.name"
+          :for="key"
           class="form__label"
-        >{{ field.label }}</label
+        >{{ key }}</label
         >
         <input
           type="text"
-          :name="field.name"
+          :name="key"
           class="form__input"
-          :required="field.required"
-          :value="props.fields[i].value"
-          @input="setValue($event.target.value, field.name)"
+          :required="true"
+          :value="value"
+          @input="setValue($event.target.value, key)"
         />
       </div>
       <input
