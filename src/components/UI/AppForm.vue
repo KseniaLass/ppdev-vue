@@ -1,29 +1,55 @@
 <script setup lang="ts">
-import type { IFormField } from '@/interfaces'
+import type { IBlocksRequest, IFormField, IPoolsRequest } from '@/interfaces'
 import { ref, toRaw, watch } from 'vue'
 
-const props = withDefaults(defineProps<{
-  fields: IFormField,
-  errorMsg: String
-}>(), {
-  errorMsg: ''
-})
+const props = withDefaults(
+  defineProps<{
+    fields: IFormField
+    errorMsg: String
+  }>(),
+  {
+    errorMsg: ''
+  }
+)
 const emit = defineEmits<{
   submit: IFormField
 }>()
 
-const values = ref({});
+const values = ref({})
 
-watch(props.fields, (val: IFormField) => {
-  values.value =  { ...val }
-})
+values.value = { ...props.fields }
+
+// watch(props.fields, (val: IFormField) => {
+//   console.log('ddd')
+//   values.value =  { ...val }
+// })
+watch(
+  () => props.fields,
+  () => {
+    console.log('prop value changed', props.fields)
+    // for(let key of props.fields.value) {
+    //   values.value[key] = props.fields[key]
+    // }
+  }
+)
 
 function setValue(value: string, key: string): void {
   values.value[key] = value
 }
 
 function submit(): void {
-  emit('submit', {...values.value})
+  emit('submit', { ...values.value })
+}
+
+//@ts-ignore
+function minusStartingBlock() {
+  values.value.startingBlock = (+props.fields.startingBlock - 20).toString()
+  values.value.blocks = (+props.fields.blocks + 20).toString()
+  submit()
+}
+function plusBlocks(count: number) {
+  values.value.blocks = (+props.fields.blocks + count).toString()
+  submit()
 }
 </script>
 
@@ -42,7 +68,7 @@ function submit(): void {
         <label
           :for="key"
           class="form__label"
-        >{{ key }}</label
+          >{{ key }}</label
         >
         <input
           type="text"
@@ -52,13 +78,28 @@ function submit(): void {
           :value="value"
           @input="setValue($event.target.value, key)"
         />
+        <div class="form__buttons">
+          <button
+            v-if="key === 'startingBlock'"
+            @click="minusStartingBlock"
+          >
+            startingBlock - 20
+          </button>
+          <button v-if="key === 'blocks'" @click="plusBlocks(100)">+ 100</button>
+          <button v-if="key === 'blocks'" @click="plusBlocks(1000)">+ 1000</button>
+        </div>
       </div>
       <input
         type="submit"
         class="form__submit"
       />
     </form>
-    <div class="form__error" v-if="props.errorMsg.length">{{errorMsg}}</div>
+    <div
+      class="form__error"
+      v-if="props.errorMsg.length"
+    >
+      {{ errorMsg }}
+    </div>
   </div>
 </template>
 
@@ -91,6 +132,7 @@ function submit(): void {
     font-weight: 600;
     height: 30px;
     font-size: 14px;
+    margin-bottom: 27px;
     &:hover {
       background: white;
     }
@@ -99,6 +141,23 @@ function submit(): void {
     margin: 15px 0 0;
     color: var.$error;
     height: 19px;
+  }
+  &__buttons {
+    height: 22px;
+    margin-top: 5px;
+    display: flex;
+    button {
+      background: var.$success;
+      border: 0;
+      border-radius: 4px;
+      color: var.$dark;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: 5px;
+      &:hover {
+        background: var.$successhover;
+      }
+    }
   }
 }
 </style>

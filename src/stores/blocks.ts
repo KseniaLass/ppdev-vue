@@ -72,6 +72,7 @@ export const useBlocksStore = defineStore('blocksStore', () => {
   })
 
   async function getBlocks(fields: IBlocksRequest): Promise<void | boolean> {
+    console.log('dfdd', fields)
     const commonStore = useCommonStore()
     if (JSON.stringify(query.value) === JSON.stringify(fields)) {
       commonStore.setCurrentPage('blocks')
@@ -79,13 +80,13 @@ export const useBlocksStore = defineStore('blocksStore', () => {
     }
     try {
       commonStore.setLoader(true)
+      query.value = fields
       blocks.value.error = ''
       const response = await baseGETRequest(
         `http://g.cybara.io/api?poolAddress=${fields.poolAddress}&startingBlock=${fields.startingBlock}&blocks=${fields.blocks}`
       )
       commonStore.setCurrentPage('blocks')
       blocks.value = response
-      query.value = fields
       router.push({ path: '/', query: fields })
     } catch (e) {
       console.error(e)
