@@ -4,6 +4,7 @@ import type { IPoolsRequest, IPoolsResponse } from '@/interfaces'
 import { useCommonStore } from '@/stores/common'
 import { baseGETRequest } from '@/functions'
 import router from '@/router'
+import { useBlocksStore } from '@/stores/blocks'
 
 export const usePoolsStore = defineStore('poolsStore', () => {
   const query = ref<IPoolsRequest>({
@@ -19,6 +20,7 @@ export const usePoolsStore = defineStore('poolsStore', () => {
 
   async function getPools(fields: IPoolsRequest): Promise<void | boolean> {
     const commonStore = useCommonStore()
+    const blocksStore = useBlocksStore()
     if (JSON.stringify(query.value) === JSON.stringify(fields)) {
       commonStore.setCurrentPage('pools')
       return true
@@ -33,9 +35,12 @@ export const usePoolsStore = defineStore('poolsStore', () => {
         pools.value = response
         router.push({path: '/', query: {txHash: fields.txHash}})
       } else {
-        console.log('generate chart')
+        blocksStore.getBlocks({
+          poolAddress: response.pools[0].Address,
+          startingBlock: response.block.toString(),
+          blocks: '100'
+        })
       }
-
     } catch (e) {
         console.error(e);
     } finally {
