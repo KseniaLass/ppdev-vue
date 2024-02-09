@@ -72,12 +72,7 @@ export const useBlocksStore = defineStore('blocksStore', () => {
   })
 
   async function getBlocks(fields: IBlocksRequest): Promise<void | boolean> {
-    console.log('dfdd', fields)
     const commonStore = useCommonStore()
-    if (JSON.stringify(query.value) === JSON.stringify(fields)) {
-      commonStore.setCurrentPage('blocks')
-      return true
-    }
     try {
       commonStore.setLoader(true)
       query.value = fields
@@ -87,7 +82,6 @@ export const useBlocksStore = defineStore('blocksStore', () => {
       )
       commonStore.setCurrentPage('blocks')
       blocks.value = response
-      router.push({ path: '/', query: fields })
     } catch (e) {
       console.error(e)
     } finally {
@@ -95,5 +89,9 @@ export const useBlocksStore = defineStore('blocksStore', () => {
     }
   }
 
-  return { query, blocks, formatChartData, getBlocks }
+  function gotToBlocks(query: IBlocksRequest) {
+    router.push({ path: '/', query: query })
+  }
+
+  return { query, blocks, formatChartData, getBlocks, gotToBlocks }
 })

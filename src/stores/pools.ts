@@ -21,10 +21,6 @@ export const usePoolsStore = defineStore('poolsStore', () => {
   async function getPools(fields: IPoolsRequest): Promise<void | boolean> {
     const commonStore = useCommonStore()
     const blocksStore = useBlocksStore()
-    if (JSON.stringify(query.value) === JSON.stringify(fields)) {
-      commonStore.setCurrentPage('pools')
-      return true
-    }
     try {
       commonStore.setLoader(true)
       pools.value.error = ''
@@ -33,7 +29,6 @@ export const usePoolsStore = defineStore('poolsStore', () => {
       if (response.pools.length > 1) {
         commonStore.setCurrentPage('pools')
         pools.value = response
-        router.push({path: '/', query: {txHash: fields.txHash}})
       } else {
         blocksStore.getBlocks({
           poolAddress: response.pools[0].Address,
@@ -48,5 +43,9 @@ export const usePoolsStore = defineStore('poolsStore', () => {
     }
   }
 
-  return { query, pools, getPools }
+  function gotToPools(query: IPoolsRequest) {
+    router.push({path: '/', query: {txHash: query.txHash}})
+  }
+
+  return { query, pools, getPools, gotToPools }
 })

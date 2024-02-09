@@ -14,7 +14,7 @@ const poolsStore = usePoolsStore()
 const blocksStore = useBlocksStore()
 
 function pickPool(pool: IPool): void {
-  blocksStore.getBlocks({
+  blocksStore.gotToBlocks({
     poolAddress: pool.Address,
     startingBlock: poolsStore.pools.block.toString() || '',
     blocks: '100'
@@ -29,13 +29,13 @@ function pickPool(pool: IPool): void {
       <AppForm
         :fields="poolsStore.query"
         :error-msg="poolsStore.pools.error"
-        @submit="poolsStore.getPools($event)"
+        @submit="poolsStore.gotToPools($event)"
       ></AppForm>
       <div class="divider"></div>
       <AppForm
         :fields="blocksStore.query"
         :error-msg="blocksStore.blocks.error"
-        @submit="blocksStore.getBlocks($event)"
+        @submit="blocksStore.gotToBlocks($event)"
       ></AppForm>
     </div>
     <AppLoader v-if="commonStore.showLoader" />
