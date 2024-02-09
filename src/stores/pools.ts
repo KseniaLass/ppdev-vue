@@ -22,14 +22,14 @@ export const usePoolsStore = defineStore('poolsStore', () => {
   const query = ref<IPoolsRequest>(state.query)
   const pools = ref<IPoolsResponse>(state.pools)
 
-  async function getPools(fields: IPoolsRequest): Promise<void | boolean> {
+  async function getPools(fields: IPoolsRequest): Promise<boolean> {
     const commonStore = useCommonStore()
     const blocksStore = useBlocksStore()
     try {
       commonStore.setLoader(true)
+      query.value = fields
       pools.value.error = ''
       const response = await baseGETRequest(`http://g.cybara.io/detect?txHash=${fields.txHash}`)
-      query.value = fields
       if (response.pools.length > 1) {
         commonStore.setCurrentPage('pools')
         pools.value = response
@@ -40,8 +40,11 @@ export const usePoolsStore = defineStore('poolsStore', () => {
           blocks: '100'
         })
       }
-    } catch (e) {
-        console.error(e);
+      return true
+    } catch (e: any) {
+      pools.value = e
+      console.error(e);
+      return false
     } finally {
       commonStore.setLoader(false)
     }
@@ -54,6 +57,9 @@ export const usePoolsStore = defineStore('poolsStore', () => {
   function clearForm() {
     query.value = state.query
   }
+  function clearError() {
+    pools.value.error = ''
+  }
 
-  return { query, pools, getPools, gotToPools, clearForm }
+  return { query, pools, getPools, gotToPools, clearForm, clearError }
 })

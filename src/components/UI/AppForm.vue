@@ -22,7 +22,7 @@ values.value = { ...props.fields }
 watch(
   () => props.fields,
   () => {
-    for(let key in {...props.fields}) {
+    for (let key in { ...props.fields }) {
       values.value[key] = props.fields[key]
     }
   }
@@ -36,15 +36,12 @@ function submit(): void {
   emit('submit', { ...values.value })
 }
 
-//@ts-ignore
 function minusStartingBlock() {
   values.value.startingBlock = (+props.fields.startingBlock - 20).toString()
   values.value.blocks = (+props.fields.blocks + 20).toString()
-  submit()
 }
 function plusBlocks(count: number) {
   values.value.blocks = (+props.fields.blocks + count).toString()
-  submit()
 }
 </script>
 
@@ -53,7 +50,7 @@ function plusBlocks(count: number) {
     <form
       action="#"
       class="form"
-      @submit.prevent="submit"
+      @submit.prevent="submit()"
     >
       <div
         v-for="(value, key) in fields"
@@ -77,16 +74,30 @@ function plusBlocks(count: number) {
           <button
             v-if="key === 'startingBlock'"
             @click="minusStartingBlock"
+            :class="{ disabled: !fields.startingBlock.length }"
           >
             startingBlock - 20
           </button>
-          <button v-if="key === 'blocks'" @click="plusBlocks(100)">+ 100</button>
-          <button v-if="key === 'blocks'" @click="plusBlocks(1000)">+ 1000</button>
+          <button
+            v-if="key === 'blocks'"
+            @click="plusBlocks(100)"
+            :class="{disabled: !fields.blocks.length}"
+          >
+            + 100
+          </button>
+          <button
+            v-if="key === 'blocks'"
+            @click="plusBlocks(1000)"
+            :class="{disabled: !fields.blocks.length}"
+          >
+            + 1000
+          </button>
         </div>
       </div>
       <input
         type="submit"
         class="form__submit"
+        value="Send"
       />
     </form>
     <div
@@ -133,9 +144,9 @@ function plusBlocks(count: number) {
     }
   }
   &__error {
-    margin: 15px 0 0;
     color: var.$error;
     height: 19px;
+    position: absolute;
   }
   &__buttons {
     height: 22px;
@@ -151,6 +162,10 @@ function plusBlocks(count: number) {
       margin-right: 5px;
       &:hover {
         background: var.$successhover;
+      }
+      &.disabled {
+        opacity: 0.5;
+        pointer-events: none;
       }
     }
   }

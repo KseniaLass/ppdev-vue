@@ -15,16 +15,18 @@ const router = createRouter({
   ]
 })
 
-router.beforeEach((to, from) => {
+router.beforeEach(async (to) => {
   const poolsStore = usePoolsStore()
   const blocksStore = useBlocksStore()
   const commonStore = useCommonStore()
+  poolsStore.clearError()
+  blocksStore.clearError()
   if (to.query.txHash) {
-    blocksStore.clearForm()
-    poolsStore.getPools(to.query)
+    const result = await poolsStore.getPools(to.query)
+    if (result) blocksStore.clearForm()
   } else if (to.query.poolAddress && to.query.startingBlock && to.query.blocks) {
-    poolsStore.clearForm()
-    blocksStore.getBlocks(to.query)
+    const result = await blocksStore.getBlocks(to.query)
+    if (result) poolsStore.clearForm()
   } else {
     blocksStore.clearForm()
     poolsStore.clearForm()

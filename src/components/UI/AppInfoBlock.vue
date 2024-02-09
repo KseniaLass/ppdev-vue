@@ -3,10 +3,12 @@ import { computed } from 'vue'
 
 const props = withDefaults(
   defineProps<{
-    json: Object,
-    clickable?: Boolean
+    json: object,
+    clickable?: boolean,
+    inline?: boolean
   }>(), {
-    clickable: false
+    clickable: false,
+    inline: false
   }
 )
 function getLast4Chars(str: string): string {
@@ -15,7 +17,7 @@ function getLast4Chars(str: string): string {
 </script>
 
 <template>
-<div class="info-block" :class="{clickable: clickable}">
+<div class="info-block" :class="{clickable: clickable, inline: inline}">
   <div v-for="(value, key) in json" :key="key" class="info-block__item">
     <template v-if="key === 'txHash'">
       <a :href="`https://etherscan.io/tx/${value}`" target="_blank">
@@ -54,6 +56,12 @@ function getLast4Chars(str: string): string {
     cursor: pointer;
     &:hover {
       color: #ebebeb;
+    }
+  }
+  &.inline {
+    .info-block__item {
+      display: inline-block;
+      margin-right: 20px;
     }
   }
   span {

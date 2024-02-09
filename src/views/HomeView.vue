@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import AppForm from '@/components/UI/AppForm.vue'
-import AppLoader from '@/components/UI/AppLoader.vue'
 import Pools from '@/components/Pools.vue'
 import Chart from '@/components/Chart.vue'
 import AppInfoBlock from '@/components/UI/AppInfoBlock.vue'
@@ -25,20 +23,6 @@ function pickPool(pool: IPool): void {
 
 <template>
   <main>
-    <div class="forms">
-      <AppForm
-        :fields="poolsStore.query"
-        :error-msg="poolsStore.pools.error"
-        @submit="poolsStore.gotToPools($event)"
-      ></AppForm>
-      <div class="divider"></div>
-      <AppForm
-        :fields="blocksStore.query"
-        :error-msg="blocksStore.blocks.error"
-        @submit="blocksStore.gotToBlocks($event)"
-      ></AppForm>
-    </div>
-    <AppLoader v-if="commonStore.showLoader" />
     <Pools
       :pools="poolsStore.pools.pools"
       @pick-pool="pickPool"
@@ -47,7 +31,7 @@ function pickPool(pool: IPool): void {
     <template
       v-if="commonStore.currentPage === 'blocks'"
     >
-      <AppInfoBlock :json="blocksStore.blocks.poolInfo"/>
+      <AppInfoBlock :json="blocksStore.blocks.poolInfo" :inline="true"/>
       <Chart
         :series="blocksStore.formatChartData"
       />

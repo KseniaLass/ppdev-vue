@@ -76,7 +76,7 @@ export const useBlocksStore = defineStore('blocksStore', () => {
     return formatData
   })
 
-  async function getBlocks(fields: IBlocksRequest): Promise<void | boolean> {
+  async function getBlocks(fields: IBlocksRequest): Promise<boolean> {
     const commonStore = useCommonStore()
     try {
       commonStore.setLoader(true)
@@ -87,8 +87,11 @@ export const useBlocksStore = defineStore('blocksStore', () => {
       )
       commonStore.setCurrentPage('blocks')
       blocks.value = response
-    } catch (e) {
+      return true
+    } catch (e: any) {
+      blocks.value = e
       console.error(e)
+      return false
     } finally {
       commonStore.setLoader(false)
     }
@@ -102,5 +105,9 @@ export const useBlocksStore = defineStore('blocksStore', () => {
     query.value = state.query
   }
 
-  return { query, blocks, formatChartData, getBlocks, gotToBlocks, clearForm }
+  function clearError() {
+    blocks.value.error = ''
+  }
+
+  return { query, blocks, formatChartData, getBlocks, gotToBlocks, clearForm, clearError }
 })
