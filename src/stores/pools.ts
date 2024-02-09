@@ -5,18 +5,22 @@ import { useCommonStore } from '@/stores/common'
 import { baseGETRequest } from '@/functions'
 import router from '@/router'
 import { useBlocksStore } from '@/stores/blocks'
-
 export const usePoolsStore = defineStore('poolsStore', () => {
-  const query = ref<IPoolsRequest>({
-    txHash: ''
-  })
-  const pools = ref<IPoolsResponse>({
-    success: true,
-    error: '',
-    txHash: '',
-    pools: [],
-    block: 0
-  })
+
+  const state = {
+    query: <IPoolsRequest> {
+      txHash: ''
+    },
+    pools: <IPoolsRequest> {
+      success: true,
+      error: '',
+      txHash: '',
+      pools: [],
+      block: 0
+    }
+  }
+  const query = ref<IPoolsRequest>(state.query)
+  const pools = ref<IPoolsResponse>(state.pools)
 
   async function getPools(fields: IPoolsRequest): Promise<void | boolean> {
     const commonStore = useCommonStore()
@@ -47,5 +51,9 @@ export const usePoolsStore = defineStore('poolsStore', () => {
     router.push({path: '/', query: {txHash: query.txHash}})
   }
 
-  return { query, pools, getPools, gotToPools }
+  function clearForm() {
+    query.value = state.query
+  }
+
+  return { query, pools, getPools, gotToPools, clearForm }
 })

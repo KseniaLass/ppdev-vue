@@ -20,10 +20,14 @@ router.beforeEach((to, from) => {
   const blocksStore = useBlocksStore()
   const commonStore = useCommonStore()
   if (to.query.txHash) {
+    blocksStore.clearForm()
     poolsStore.getPools(to.query)
   } else if (to.query.poolAddress && to.query.startingBlock && to.query.blocks) {
+    poolsStore.clearForm()
     blocksStore.getBlocks(to.query)
   } else {
+    blocksStore.clearForm()
+    poolsStore.clearForm()
     commonStore.setCurrentPage('default')
   }
   return true

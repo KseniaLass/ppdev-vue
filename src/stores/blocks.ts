@@ -6,17 +6,22 @@ import { baseGETRequest } from '@/functions'
 import router from '@/router'
 
 export const useBlocksStore = defineStore('blocksStore', () => {
-  const query = ref<IBlocksRequest>({
-    poolAddress: '',
-    startingBlock: '',
-    blocks: ''
-  })
-  const blocks = ref<IBlocksResponse>({
-    success: true,
-    error: '',
-    poolInfo: {},
-    blocks: []
-  })
+  const state = {
+    query: <IBlocksRequest> {
+      poolAddress: '',
+      startingBlock: '',
+      blocks: ''
+    },
+    blocks: <IBlocksResponse> {
+      success: true,
+      error: '',
+      poolInfo: {},
+      blocks: []
+    }
+  }
+
+  const query = ref<IBlocksRequest>(state.query)
+  const blocks = ref<IBlocksResponse>(state.blocks)
 
   const formatChartData = computed((): ICandle[] => {
     if (blocks.value.blocks.length === 0) return []
@@ -93,5 +98,9 @@ export const useBlocksStore = defineStore('blocksStore', () => {
     router.push({ path: '/', query: query })
   }
 
-  return { query, blocks, formatChartData, getBlocks, gotToBlocks }
+  function clearForm() {
+    query.value = state.query
+  }
+
+  return { query, blocks, formatChartData, getBlocks, gotToBlocks, clearForm }
 })
