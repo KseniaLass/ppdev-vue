@@ -2,12 +2,12 @@
 import AppInfoBlock from '@/components/UI/AppInfoBlock.vue'
 import type { IPool } from '@/interfaces'
 
-const props = defineProps<{
+defineProps<{
   pools: IPool[]
 }>()
 
 const emits = defineEmits<{
-  pickPool: IPool
+  pickPool: any | IPool
 }>()
 </script>
 

@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import { usePoolsStore } from '@/stores/pools'
 import { useBlocksStore } from '@/stores/blocks'
 import { useCommonStore } from '@/stores/common'
+import type { IBlocksRequest, IPoolsRequest } from '@/interfaces'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -19,17 +20,13 @@ router.beforeEach(async (to) => {
   const poolsStore = usePoolsStore()
   const blocksStore = useBlocksStore()
   const commonStore = useCommonStore()
-  poolsStore.clearError()
-  blocksStore.clearError()
+  poolsStore.clearState()
+  blocksStore.clearState()
   if (to.query.txHash) {
-    const result = await poolsStore.getPools(to.query)
-    if (result) blocksStore.clearForm()
+    await poolsStore.getPools(to.query)
   } else if (to.query.poolAddress && to.query.startingBlock && to.query.blocks) {
-    const result = await blocksStore.getBlocks(to.query)
-    if (result) poolsStore.clearForm()
+    await blocksStore.getBlocks(to.query)
   } else {
-    blocksStore.clearForm()
-    poolsStore.clearForm()
     commonStore.setCurrentPage('default')
   }
   return true

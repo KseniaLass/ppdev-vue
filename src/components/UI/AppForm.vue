@@ -5,17 +5,17 @@ import { ref, watch } from 'vue'
 const props = withDefaults(
   defineProps<{
     fields: IFormField
-    errorMsg: String
+    errorMsg: string
   }>(),
   {
     errorMsg: ''
   }
 )
 const emit = defineEmits<{
-  submit: IFormField
+  submit: any
 }>()
 
-const values = ref({})
+const values = ref()
 
 values.value = { ...props.fields }
 
@@ -28,7 +28,7 @@ watch(
   }
 )
 
-function setValue(value: string, key: string): void {
+function setValue(value: string, key: string | number): void {
   values.value[key] = value
 }
 
@@ -58,17 +58,17 @@ function plusBlocks(count: number) {
         class="form__field"
       >
         <label
-          :for="key"
+          :for="key as string"
           class="form__label"
           >{{ key }}</label
         >
         <input
           type="text"
-          :name="key"
+          :name="key as string"
           class="form__input"
           :required="true"
           :value="value"
-          @input="setValue($event.target.value, key)"
+          @input="setValue(($event.target as HTMLInputElement).value, key)"
         />
         <div class="form__buttons">
           <button

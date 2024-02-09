@@ -27,6 +27,7 @@ const options = {
   }
 }
 
+// @ts-ignore
 function clickHandler(_: Event, { w }, { seriesIndex, dataPointIndex }): void {
   const candle = w.config.series[seriesIndex].data[dataPointIndex]
   pricesInfo.value = candle.prices

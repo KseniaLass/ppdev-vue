@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Pools from '@/components/Pools.vue'
-import Chart from '@/components/Chart.vue'
+import Pools from '@/components/AppPools.vue'
+import Chart from '@/components/AppChart.vue'
 import AppInfoBlock from '@/components/UI/AppInfoBlock.vue'
 import { useCommonStore } from '@/stores/common'
 import { usePoolsStore } from '@/stores/pools'

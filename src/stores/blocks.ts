@@ -4,6 +4,7 @@ import type { IBlocksRequest, IBlocksResponse, ICandle, IPrice } from '@/interfa
 import { useCommonStore } from '@/stores/common'
 import { baseGETRequest } from '@/functions'
 import router from '@/router'
+import type { LocationQuery } from 'vue-router'
 
 export const useBlocksStore = defineStore('blocksStore', () => {
   const state = {
@@ -15,7 +16,17 @@ export const useBlocksStore = defineStore('blocksStore', () => {
     blocks: <IBlocksResponse> {
       success: true,
       error: '',
-      poolInfo: {},
+      poolInfo: {
+        poolAddress: '',
+        token0: '',
+        token1: '',
+        ticker0: '',
+        ticker1: '',
+        decimals0: 0,
+        decimals1: 0,
+        poolVersion: '',
+        startingPrice: '',
+      },
       blocks: []
     }
   }
@@ -76,11 +87,11 @@ export const useBlocksStore = defineStore('blocksStore', () => {
     return formatData
   })
 
-  async function getBlocks(fields: IBlocksRequest): Promise<boolean> {
+  async function getBlocks(fields: LocationQuery | IBlocksRequest): Promise<boolean> {
     const commonStore = useCommonStore()
     try {
       commonStore.setLoader(true)
-      query.value = fields
+      query.value = fields as IBlocksRequest
       blocks.value.error = ''
       const response = await baseGETRequest(
         `http://g.cybara.io/api?poolAddress=${fields.poolAddress}&startingBlock=${fields.startingBlock}&blocks=${fields.blocks}`
@@ -98,16 +109,13 @@ export const useBlocksStore = defineStore('blocksStore', () => {
   }
 
   function gotToBlocks(query: IBlocksRequest) {
-    router.push({ path: '/', query: query })
+    router.push({ path: '/', query: {...query} })
   }
 
-  function clearForm() {
+  function clearState() {
     query.value = state.query
+    blocks.value = state.blocks
   }
 
-  function clearError() {
-    blocks.value.error = ''
-  }
-
-  return { query, blocks, formatChartData, getBlocks, gotToBlocks, clearForm, clearError }
+  return { query, blocks, formatChartData, getBlocks, gotToBlocks, clearState }
 })

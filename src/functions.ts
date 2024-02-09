@@ -1,5 +1,3 @@
-import type { ICandle, IChartResponse, IPrice } from '@/interfaces'
-
 export async function baseGETRequest(url: string): Promise<any> {
   const response = await fetch(url, {
     method: 'GET',
@@ -10,8 +8,4 @@ export async function baseGETRequest(url: string): Promise<any> {
   } else {
     throw json
   }
-}
-
-export function formatChartData(data: IChartResponse): ICandle[] {
-
 }
