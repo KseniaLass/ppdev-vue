@@ -1,0 +1,7 @@
+Андрей, [24.01.2024 11:24]
+http://g.cybara.io/detect?txHash=0xbe72189315a9c80c343d950daa808d2717ab36cc77a0d401b2e2776646d9e8f4
+
+Андрей, [24.01.2024 11:24]
+http://g.cybara.io/detect?txHash=0xc9bdaee949101e5a1d57bbfa03edb83f433a60e83891e64542e1f7dd73836568
+
+http://g.cybara.io/api?poolAddress=0xb7426bfd2abf64428fa82a71b0d44b056ffcc286&startingBlock=19061710&blocks=100

@@ -26,16 +26,14 @@ function pickPool(pool: IPool): void {
     <Pools
       :pools="poolsStore.pools.pools"
       @pick-pool="pickPool"
-      v-if="commonStore.currentPage === 'pools'"
+      v-show="commonStore.currentPage === 'pools'"
     />
-    <template
-      v-if="commonStore.currentPage === 'blocks'"
-    >
+    <div class="blocks" v-show="commonStore.currentPage === 'blocks'">
       <AppInfoBlock :json="blocksStore.blocks.poolInfo" :inline="true"/>
       <Chart
         :series="blocksStore.formatChartData"
       />
-    </template>
+    </div>
   </main>
 </template>
 
