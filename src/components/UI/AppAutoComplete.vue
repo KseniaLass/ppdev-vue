@@ -1,26 +1,24 @@
 <script setup lang="ts">
+import { onClickOutside } from '@vueuse/core'
 /** key - token, value - human name*/
 interface Field {
   [key: string]: string
 }
 
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 
 const currentValue = ref('')
+const currentId = ref('')
 const showList = ref<boolean>(false)
+const autocomplete = ref(null)
 
 const props = defineProps<{
-  list: Field,
-  value: ''
+  list: Field
 }>()
 
 const emits = defineEmits<{
   select: string
 }>()
-
-watch(props.value, (newVal) => {
-  currentValue.value = newVal
-})
 
 const filterList = computed(() => {
   let filtered = {}
@@ -29,7 +27,7 @@ const filterList = computed(() => {
       if (Object.keys(filtered).length === 5) {
         break
       }
-      if (props.list[key].startsWith(currentValue.value)) {
+      if (props.list[key].toLowerCase().startsWith(currentValue.value.toLowerCase())) {
         filtered[key] = props.list[key]
       }
     }
@@ -40,21 +38,31 @@ const filterList = computed(() => {
 function focus() {
   if (currentValue.value.length) showList.value = true
 }
+function input() {
+  focus()
+  currentId.value = null
+  emits('select', null)
+}
 
 function select(id, value) {
   showList.value = false
   currentValue.value = value
+  currentId.value = id
   emits('select', id)
 }
+onClickOutside(autocomplete, () => (showList.value = false))
 </script>
 
 <template>
-  <div class="autocomplete">
+  <div
+    class="autocomplete"
+    ref="autocomplete"
+  >
     <input
       type="text"
       v-model="currentValue"
       class="form__input"
-      @input="focus"
+      @input="input"
       @focus="focus"
     />
     <ul
@@ -82,6 +90,7 @@ function select(id, value) {
     padding: 0;
     border-radius: var.$border-radius;
     overflow: hidden;
+    z-index: 10;
     li {
       list-style-type: none;
       padding: 5px 10px;

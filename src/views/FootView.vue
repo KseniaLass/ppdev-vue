@@ -38,8 +38,8 @@ const footFormFields = computed((): IFormField[] => {
 
 <template>
   <div class="foots">
-    <AppForm :fields="footFormFields" @submit="footStore.getFoots($event)"/>
-    <AppInfoBlock :json="footStore.foots"/>
+    <AppForm :fields="footFormFields" @submit="footStore.getFoots($event)" :error-msg="footStore.error"/>
+    <AppInfoBlock :json="footStore.foots" v-if="footStore.foots && !footStore.error"/>
   </div>
 </template>
 
