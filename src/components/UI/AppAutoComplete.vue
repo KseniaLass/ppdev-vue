@@ -17,7 +17,7 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits<{
-  select: string
+  select: any
 }>()
 
 const filterList = computed(() => {
@@ -28,6 +28,7 @@ const filterList = computed(() => {
         break
       }
       if (props.list[key].toLowerCase().startsWith(currentValue.value.toLowerCase())) {
+        //@ts-ignore
         filtered[key] = props.list[key]
       }
     }
@@ -40,11 +41,11 @@ function focus() {
 }
 function input() {
   focus()
-  currentId.value = null
-  emits('select', null)
+  currentId.value = ''
+  emits('select', '')
 }
 
-function select(id, value) {
+function select(id: string, value: string) {
   showList.value = false
   currentValue.value = value
   currentId.value = id
