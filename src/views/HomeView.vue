@@ -19,7 +19,8 @@ const poolsFormFields = computed((): IFormField[] => {
       name: 'txHash',
       value: poolsStore.query.txHash,
       type: 'text',
-      required: true
+      required: true,
+      hidden: false
     }
   ]
 })
@@ -30,19 +31,22 @@ const blocksFormFields = computed((): IFormField[] => {
       name: 'poolAddress',
       value: blocksStore.query.poolAddress,
       type: 'text',
-      required: true
+      required: true,
+      hidden: false
     },
     {
       name: 'startingBlock',
       value: blocksStore.query.startingBlock,
       type: 'text',
-      required: true
+      required: true,
+      hidden: false
     },
     {
       name: 'blocks',
       value: blocksStore.query.blocks,
       type: 'text',
-      required: true
+      required: true,
+      hidden: false
     }
   ]
 })

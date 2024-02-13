@@ -1,8 +1,10 @@
 export interface IFormField {
   name: string
-  value: string | number
+  value: string | number | boolean
   type: InputType
   required: boolean
+  hidden: boolean
+  autoCompleteList?: any
 }
 export interface IPoolsRequest {
   txHash: string
@@ -24,6 +26,21 @@ export interface IBlocksRequest {
   poolAddress: string
   startingBlock: string
   blocks: string
+}
+
+export interface IFootRequest {
+  token: string
+  size: string
+  human: boolean
+}
+export interface IFootResponse {
+  AmountInTotal: string,
+  AmountOutTotalUsd: string,
+  AmountOutTotalEth: string,
+  PPTusd: string,
+  PPTeth: string,
+  ETHUSD: string,
+  Swaps: ISwap[]
 }
 export interface IPool {
   Address: string
@@ -62,8 +79,15 @@ export interface IPoolInfo {
   poolVersion: string
   startingPrice: string
 }
+interface ISwap {
+  AmountIn: number,
+  AmountInHuman: string,
+  AmountOut: number,
+  AmountOutHuman: string,
+  PoolContract: string
+}
 interface IBlock {
   blockNumber: number
   prices: IPrice[]
 }
-type InputType = 'text' | 'number' | 'select'
+type InputType = 'text' | 'number' | 'autocomplete' | 'checkbox'

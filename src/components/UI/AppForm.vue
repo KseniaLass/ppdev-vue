@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { IFormField } from '@/interfaces'
 import { ref } from 'vue'
+import AppAutoComplete from '@/components/UI/AppAutoComplete.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -53,6 +54,7 @@ function plusBlocks(count: number) {
         v-for="field in fields"
         :key="field.name"
         class="form__field"
+        v-show="!field.hidden"
       >
         <label
           :for="field.name"
@@ -60,12 +62,18 @@ function plusBlocks(count: number) {
           >{{ field.name }}</label
         >
         <input
+          v-if="field.type === 'text'"
           type="text"
           :name="field.name"
           class="form__input"
           :required="field.required"
           :value="field.value"
           @input="setValue(($event.target as HTMLInputElement).value, field.name)"
+        />
+        <AppAutoComplete
+          v-if="field.type === 'autocomplete'"
+          :list="field.autoCompleteList"
+          @select="setValue($event, field.name)"
         />
         <div class="form__buttons">
           <button
@@ -78,14 +86,14 @@ function plusBlocks(count: number) {
           <button
             v-if="field.name === 'blocks'"
             @click="plusBlocks(100)"
-            :class="{disabled: !field.value}"
+            :class="{ disabled: !field.value }"
           >
             + 100
           </button>
           <button
             v-if="field.name === 'blocks'"
             @click="plusBlocks(1000)"
-            :class="{disabled: !field.value}"
+            :class="{ disabled: !field.value }"
           >
             + 1000
           </button>
@@ -106,7 +114,7 @@ function plusBlocks(count: number) {
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss">
 @use '@/assets/css/variables.scss' as var;
 .form {
   display: flex;
