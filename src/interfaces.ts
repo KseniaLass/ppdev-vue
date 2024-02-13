@@ -1,5 +1,8 @@
 export interface IFormField {
-  [key: string]: string
+  name: string
+  value: string | number
+  type: InputType
+  required: boolean
 }
 export interface IPoolsRequest {
   txHash: string
@@ -63,3 +66,4 @@ interface IBlock {
   blockNumber: number
   prices: IPrice[]
 }
+type InputType = 'text' | 'number' | 'select'

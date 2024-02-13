@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { IFormField } from '@/interfaces'
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 
 const props = withDefaults(
   defineProps<{
-    fields: IFormField
+    fields: IFormField[]
     errorMsg: string
   }>(),
   {
@@ -15,18 +15,15 @@ const emit = defineEmits<{
   submit: any
 }>()
 
-const values = ref()
+const values = ref<any>({})
 
-values.value = { ...props.fields }
+setValues()
 
-watch(
-  () => props.fields,
-  () => {
-    for (let key in { ...props.fields }) {
-      values.value[key] = props.fields[key]
-    }
-  }
-)
+function setValues() {
+  props.fields.forEach((val: IFormField) => {
+    values.value[val.name] = val.value
+  })
+}
 
 function setValue(value: string, key: string | number): void {
   values.value[key] = value
@@ -37,11 +34,11 @@ function submit(): void {
 }
 
 function minusStartingBlock() {
-  values.value.startingBlock = (+props.fields.startingBlock - 20).toString()
-  values.value.blocks = (+props.fields.blocks + 20).toString()
+  values.value.startingBlock = (+values.value.startingBlock - 20).toString()
+  values.value.blocks = (+values.value.blocks + 20).toString()
 }
 function plusBlocks(count: number) {
-  values.value.blocks = (+props.fields.blocks + count).toString()
+  values.value.blocks = (+values.value.blocks + count).toString()
 }
 </script>
 
@@ -53,42 +50,42 @@ function plusBlocks(count: number) {
       @submit.prevent="submit()"
     >
       <div
-        v-for="(value, key) in fields"
-        :key="key"
+        v-for="field in fields"
+        :key="field.name"
         class="form__field"
       >
         <label
-          :for="key as string"
+          :for="field.name"
           class="form__label"
-          >{{ key }}</label
+          >{{ field.name }}</label
         >
         <input
           type="text"
-          :name="key as string"
+          :name="field.name"
           class="form__input"
-          :required="true"
-          :value="value"
-          @input="setValue(($event.target as HTMLInputElement).value, key)"
+          :required="field.required"
+          :value="field.value"
+          @input="setValue(($event.target as HTMLInputElement).value, field.name)"
         />
         <div class="form__buttons">
           <button
-            v-if="key === 'startingBlock'"
+            v-if="field.name === 'startingBlock'"
             @click="minusStartingBlock"
-            :class="{ disabled: !fields.startingBlock.length }"
+            :class="{ disabled: !field.value }"
           >
             startingBlock - 20
           </button>
           <button
-            v-if="key === 'blocks'"
+            v-if="field.name === 'blocks'"
             @click="plusBlocks(100)"
-            :class="{disabled: !fields.blocks.length}"
+            :class="{disabled: !field.value}"
           >
             + 100
           </button>
           <button
-            v-if="key === 'blocks'"
+            v-if="field.name === 'blocks'"
             @click="plusBlocks(1000)"
-            :class="{disabled: !fields.blocks.length}"
+            :class="{disabled: !field.value}"
           >
             + 1000
           </button>
