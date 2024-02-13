@@ -32,7 +32,7 @@ export const usePoolsStore = defineStore('poolsStore', () => {
       pools.value.error = ''
       const response = await baseGETRequest(`http://g.cybara.io/detect?txHash=${fields.txHash}`)
       if (response.pools.length > 1) {
-        commonStore.setCurrentPage('pools')
+        commonStore.setCurrentChartStage('pools')
         pools.value = response
       } else {
         blocksStore.gotToBlocks({

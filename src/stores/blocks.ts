@@ -96,7 +96,7 @@ export const useBlocksStore = defineStore('blocksStore', () => {
       const response = await baseGETRequest(
         `http://g.cybara.io/api?poolAddress=${fields.poolAddress}&startingBlock=${fields.startingBlock}&blocks=${fields.blocks}`
       )
-      commonStore.setCurrentPage('blocks')
+      commonStore.setCurrentChartStage('blocks')
       blocks.value = response
       return true
     } catch (e: any) {

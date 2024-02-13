@@ -6,6 +6,7 @@ import { useCommonStore } from '@/stores/common'
 import { usePoolsStore } from '@/stores/pools'
 import { useBlocksStore } from '@/stores/blocks'
 import type { IPool } from '@/interfaces'
+import AppForm from '@/components/UI/AppForm.vue'
 
 const commonStore = useCommonStore()
 const poolsStore = usePoolsStore()
@@ -23,12 +24,25 @@ function pickPool(pool: IPool): void {
 
 <template>
   <main>
+    <div class="forms">
+      <AppForm
+        :fields="poolsStore.query"
+        :error-msg="poolsStore.pools.error"
+        @submit="poolsStore.gotToPools($event)"
+      ></AppForm>
+      <div class="divider"></div>
+      <AppForm
+        :fields="blocksStore.query"
+        :error-msg="blocksStore.blocks.error"
+        @submit="blocksStore.gotToBlocks($event)"
+      ></AppForm>
+    </div>
     <Pools
       :pools="poolsStore.pools.pools"
       @pick-pool="pickPool"
-      v-show="commonStore.currentPage === 'pools'"
+      v-show="commonStore.currentChartStage === 'pools'"
     />
-    <div class="blocks" v-show="commonStore.currentPage === 'blocks'">
+    <div class="blocks" v-show="commonStore.currentChartStage === 'blocks'">
       <AppInfoBlock :json="blocksStore.blocks.poolInfo" :inline="true"/>
       <Chart
         :series="blocksStore.formatChartData"
